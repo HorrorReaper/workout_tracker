@@ -2,13 +2,13 @@
 
 import { useEffect, useState } from 'react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
-import {formatDate} from "@/lib/utils";
+import { formatDate } from '@/lib/utils';
 
 type Set = {
-    date: string;
+    created_at: string;
     weight: number;
     reps: number;
-    setNumber: number;  // New field to distinguish sets
+    setNumber: number;  // To differentiate sets
 };
 
 export default function ExerciseProgressChart({ exerciseId }: { exerciseId: number }) {
@@ -17,7 +17,6 @@ export default function ExerciseProgressChart({ exerciseId }: { exerciseId: numb
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState('');
 
-    // Fetch Data Based on Chart Mode
     useEffect(() => {
         const fetchData = async () => {
             setLoading(true);
@@ -27,7 +26,7 @@ export default function ExerciseProgressChart({ exerciseId }: { exerciseId: numb
                 const response = await fetch('/api/workout/history', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ exerciseId, mode: chartMode }), // Send mode to API
+                    body: JSON.stringify({ exerciseId, mode: chartMode }),
                 });
 
                 if (!response.ok) throw new Error('Failed to fetch workout data.');
@@ -35,7 +34,8 @@ export default function ExerciseProgressChart({ exerciseId }: { exerciseId: numb
                 data = data.map(item => ({
                     ...item,
                     created_at: formatDate(item.created_at) // Format date for chart
-                }))
+                }));
+
                 console.log('Workout data:', data);
                 setChartData(data);
             } catch (err) {
@@ -47,7 +47,7 @@ export default function ExerciseProgressChart({ exerciseId }: { exerciseId: numb
         };
 
         fetchData();
-    }, [exerciseId, chartMode]); // Fetch data when mode changes
+    }, [exerciseId, chartMode]);
 
     return (
         <div className="p-4 bg-white shadow-md rounded-md">
@@ -74,11 +74,10 @@ export default function ExerciseProgressChart({ exerciseId }: { exerciseId: numb
                     <YAxis />
                     <Tooltip />
                     <Legend />
-                    {chartMode === 'all' ? (
-                        <Line type="monotone" dataKey="weight" stroke="#8884d8" />
-                    ) : (
-                        <Line type="monotone" dataKey="weight" stroke="#82ca9d" />
-                    )}
+
+                    {/* ✅ Show weight and reps together */}
+                    <Line type="monotone" dataKey="weight" stroke="#8884d8" name="Weight (kg)" />
+                    <Line type="monotone" dataKey="reps" stroke="#82ca9d" name="Reps" />
                 </LineChart>
             </ResponsiveContainer>
         </div>

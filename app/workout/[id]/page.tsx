@@ -210,14 +210,14 @@ export default function workoutTrackerPage({ params }) {
                                 <a href={`../exercise/${exercise.id}`}><p>more information</p></a>
                                 <PauseTimer startPause={Pause} setStartPause={setPause} />
                             </div>
-                            <div>
+                            <div className="ml-auto">
                                 <button
                                     onClick={() =>
                                         setSelectedExercises((prev) =>
                                             prev.filter((ex) => ex.id !== exercise.id)
                                         )
                                     }
-                                    className="bg-red-500 text-white px-4 py-2 rounded ml-auto"
+                                    className="bg-red-500 text-white px-4 py-2 rounded"
                                 >
                                     Remove
                                 </button>
