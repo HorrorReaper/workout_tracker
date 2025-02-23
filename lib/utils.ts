@@ -10,3 +10,4 @@ export const formatDate = (isoString: string) => {
     hour: '2-digit', minute: '2-digit', hour12: true
   }).format(new Date(isoString));
 };
+export const muscleGroups = ["Chest", "Back", "Legs", "Shoulders", "Arms", "Core"];

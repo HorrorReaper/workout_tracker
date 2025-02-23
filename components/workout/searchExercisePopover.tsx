@@ -1,6 +1,7 @@
 'use client';
 import { useEffect, useState } from 'react';
-import AddCustomExercise from "@/components/workout/AddCustomExercise";
+import {muscleGroups} from "@/lib/utils";
+import AddCustomExerciseButton from "@/components/workout/addCustomExerciseButton";
 
 type Exercise = {
     id: number;
@@ -19,31 +20,9 @@ export default function SearchExercisePopover({
     const [searchQuery, setSearchQuery] = useState('');
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState('');
-    const muscleGroups = ["Chest", "Back", "Legs", "Shoulders", "Arms", "Core"];
+
 
     const [selectedMuscleGroup, setSelectedMuscleGroup] = useState("");
-
-    /*useEffect(() => {
-        const fetchExercises = async () => {
-            try {
-                const response = await fetch('/api/workout/getExercises', { method: 'GET' });
-                if (!response.ok) {
-                    throw new Error('Failed to fetch exercises');
-                }
-
-                const data = await response.json();
-                setExercises(data.exercises);
-                setFilteredExercises(data.exercises);
-            } catch (err) {
-                console.error('Error fetching exercises:', err);
-                setError('Failed to load exercises. Please try again later.');
-            } finally {
-                setLoading(false);
-            }
-        };
-
-        fetchExercises();
-    }, []);*/
 
 
     const fetchExercises = async () => {
@@ -122,7 +101,7 @@ export default function SearchExercisePopover({
                     </div>
                 ))}
             </div>
-            <AddCustomExercise />
+            <AddCustomExerciseButton />
         </div>
     );
 }
