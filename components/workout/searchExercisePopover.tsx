@@ -5,6 +5,7 @@ type Exercise = {
     id: number;
     description: string;
     image_url: string;
+    muscle_groups: string[];
 };
 
 export default function SearchExercisePopover({
@@ -17,8 +18,11 @@ export default function SearchExercisePopover({
     const [searchQuery, setSearchQuery] = useState('');
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState('');
+    const muscleGroups = ["Chest", "Back", "Legs", "Shoulders", "Arms", "Core"];
 
-    useEffect(() => {
+    const [selectedMuscleGroup, setSelectedMuscleGroup] = useState("");
+
+    /*useEffect(() => {
         const fetchExercises = async () => {
             try {
                 const response = await fetch('/api/workout/getExercises', { method: 'GET' });
@@ -38,7 +42,33 @@ export default function SearchExercisePopover({
         };
 
         fetchExercises();
-    }, []);
+    }, []);*/
+
+
+    const fetchExercises = async () => {
+        try {
+            const queryParams = new URLSearchParams();
+            if (searchQuery) queryParams.append("searchQuery", searchQuery);
+            if (selectedMuscleGroup) queryParams.append("muscleGroup", selectedMuscleGroup);
+
+            const response = await fetch(`/api/workout/getExercises?${queryParams.toString()}`);
+            if (!response.ok) throw new Error("Failed to fetch exercises");
+
+            const data = await response.json();
+            setExercises(data.exercises);
+            setFilteredExercises(data.exercises);
+        } catch (err) {
+            console.error("Error fetching exercises:", err);
+            setError("Failed to load exercises. Please try again later.");
+        } finally {
+            setLoading(false);
+        }
+    };
+    useEffect(() => {
+        fetchExercises();
+    }, [searchQuery, selectedMuscleGroup]);
+
+
 
     useEffect(() => {
         if (searchQuery) {
@@ -53,6 +83,16 @@ export default function SearchExercisePopover({
 
     return (
         <div className="p-4">
+            <select
+                value={selectedMuscleGroup}
+                onChange={(e) => setSelectedMuscleGroup(e.target.value)}
+                className="mb-4 p-2 border rounded w-full"
+            >
+                <option value="">All Muscle Groups</option>
+                {muscleGroups.map((group) => (
+                    <option key={group} value={group}>{group}</option>
+                ))}
+            </select>
             <input
                 className="rounded-2xl py-2 px-5 border-2 border-blue-400 w-full"
                 type="text"
