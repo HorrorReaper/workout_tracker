@@ -1,5 +1,6 @@
 import {NextResponse} from "next/server";
 import pool from "@/lib/db";
+import {cookies} from "next/headers";
 
 /*export  async function GET() {
     try {
@@ -24,10 +25,11 @@ import pool from "@/lib/db";
 }*/
 export async function GET(request: Request) {
     const { searchQuery, muscleGroup } = Object.fromEntries(new URL(request.url).searchParams);
+    const  userId  = (await cookies()).get('userId')?.value;
 
     try {
-        let query = "SELECT * FROM exercises WHERE 1=1";
-        let params: any[] = [];
+        let query = "SELECT * FROM exercises WHERE (user_id IS NULL OR user_id = ?)";
+        let params: any[] = [userId];
 
         if (searchQuery) {
             query += " AND description LIKE ?";

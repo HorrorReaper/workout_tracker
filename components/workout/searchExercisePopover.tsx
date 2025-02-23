@@ -1,5 +1,6 @@
 'use client';
 import { useEffect, useState } from 'react';
+import AddCustomExercise from "@/components/workout/AddCustomExercise";
 
 type Exercise = {
     id: number;
@@ -121,6 +122,7 @@ export default function SearchExercisePopover({
                     </div>
                 ))}
             </div>
+            <AddCustomExercise />
         </div>
     );
 }
