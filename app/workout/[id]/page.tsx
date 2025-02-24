@@ -81,12 +81,15 @@ export default function workoutTrackerPage({ params }) {
                 body: JSON.stringify({ exerciseId, anzahl, setNumber}),
             });
             const data = await response.json();
-            console.log('data', data);
-            console.log('data', data);
-            console.log('weight', data.sets[0].weight, " neu:", weight);
-            console.log('reps', data.sets[0].reps, " neu:", reps);
+            if (data.sets.length > 0) {
+                console.log('data', data);
+                console.log('data', data);
+                console.log('weight', data.sets[0].weight, " neu:", weight);
+                console.log('reps', data.sets[0].reps, " neu:", reps);
+            }
+
             if (!response.ok) throw new Error('Failed to fetch last sets.');
-            if(data.sets[0].weight < weight && data.sets[0].reps === reps && type === 'normal') {
+            if(data.sets.length > 0 && data.sets[0].weight < weight && data.sets[0].reps === reps && type === 'normal') {
                 console.log('You have improved!');
                 setCelebrationMessage('You have improved the weight by ' + (weight - data.sets[0].weight) + ' kg!');
                 const timer = setTimeout(() => {
@@ -94,7 +97,7 @@ export default function workoutTrackerPage({ params }) {
                 }, 1000);
                 clearTimeout(timer);
             }
-            else if (data.sets[0].reps < reps && data.sets[0].weight === weight && type === 'normal') {
+            else if ( data.sets.length > 0 &&  data.sets[0].reps < reps && data.sets[0].weight === weight && type === 'normal') {
                 console.log('You have improved!');
                 setCelebrationMessage('You have improved the reps by ' + (reps - data.sets[0].reps) + ' reps!');
                 const timer = setTimeout(() => {
@@ -102,7 +105,7 @@ export default function workoutTrackerPage({ params }) {
                 }, 1000);
                 clearTimeout(timer);
             }
-            else if(data.sets[0].weight < weight && data.sets[0].reps < reps && type === 'normal') {
+            else if(data.sets.length > 0 &&  data.sets[0].weight < weight && data.sets[0].reps < reps && type === 'normal') {
                 console.log('You have improved!');
                 setCelebrationMessage('You have improved the weight by ' + (weight - data.sets[0].weight) + ' kg and the reps by ' + (reps - data.sets[0].reps) + ' reps!');
                 const timer = setTimeout(() => {

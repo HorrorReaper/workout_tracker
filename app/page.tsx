@@ -4,6 +4,7 @@ import { useState, useEffect } from "react"; // Add useEffect
 import FriendRequests from "@/components/FriendRequests";
 import {useRouter, useSearchParams} from 'next/navigation';
 import {router} from "next/client";
+import FriendRequestForm from "@/components/Home/FriendRequestForm";
 
 export default function Home() {
     const searchParams = useSearchParams();
@@ -128,24 +129,7 @@ export default function Home() {
             {/* Add Friend Section */}
             <div className="bg-white shadow-md rounded-lg p-4 mb-6">
                 <h2 className="text-xl font-semibold mb-3">Add a Friend</h2>
-                <form onSubmit={sendFriendRequest} className="flex gap-2">
-                    <input
-                        type="number"
-                        id="userId"
-                        name="userId"
-                        value={friendId}
-                        onChange={(e) => setFriendId(Number(e.target.value))}
-                        required
-                        placeholder="Enter friend’s User ID"
-                        className="w-full border border-gray-300 rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    />
-                    <button
-                        type="submit"
-                        className="bg-blue-500 text-white px-4 py-2 rounded-lg shadow hover:bg-blue-600 transition"
-                    >
-                        Send Request
-                    </button>
-                </form>
+                <FriendRequestForm />
             </div>
 
             {/* Friends List */}

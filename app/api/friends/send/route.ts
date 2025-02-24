@@ -1,9 +1,11 @@
 // app/api/friends/send/route.ts
 import { NextResponse } from 'next/server';
 import pool from '@/lib/db';
+import {cookies} from "next/headers";
 
 export async function POST(request: Request) {
-    const { userId, friendId } = await request.json();
+    const { friendId } = await request.json();
+    const  userId  = (await cookies()).get('userId')?.value;
 
     try {
         // Check if the friend request already exists

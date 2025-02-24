@@ -16,6 +16,8 @@ export async function POST(request: Request) {
                 }
             }
         }
+        const [result] = await pool.execute('UPDATE workouts SET finished_at = ? WHERE id = ?', [new Date(), workoutId]);
+
         return NextResponse.json({ message: 'Workout saved successfully' });
     }catch (error) {
         console.error('Error saving workout:', error);
