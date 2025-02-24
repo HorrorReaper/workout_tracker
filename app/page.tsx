@@ -2,7 +2,8 @@
 import CreateWorkoutForm from "@/components/CreateWorkoutForm";
 import { useState, useEffect } from "react"; // Add useEffect
 import FriendRequests from "@/components/FriendRequests";
-import { useSearchParams } from 'next/navigation';
+import {useRouter, useSearchParams} from 'next/navigation';
+import {router} from "next/client";
 
 export default function Home() {
     const searchParams = useSearchParams();
@@ -10,6 +11,8 @@ export default function Home() {
     const [friendId, setFriendId] = useState<number>(0);
     const [userId, setUserId] = useState<number>(0);
     const [friends, setFriends] = useState<any[]>([]);
+    const [activeWorkouts, setActiveWorkouts] = useState<any[]>([]);
+    const router = useRouter();
 
     // Add useEffect to handle the API call
     useEffect(() => {
@@ -65,32 +68,100 @@ export default function Home() {
             console.error('Error:', error);
         }
     }
+    const getActiveWorkouts = async () => {
+        try {
+            const response = await fetch('/api/workout/getActiveWorkouts', {
+                method: 'GET',
+                headers: { 'Content-Type': 'application/json' },
+            });
+
+            if (!response.ok) throw new Error('Failed to get active workouts.');
+            const data = await response.json();
+            console.log('Active workouts:', data.workouts);
+            setActiveWorkouts(data.workouts);
+            return data;
+        } catch (error) {
+            console.error('Error:', error);
+        }
+    }
     useEffect(() => {
         if (!userId) return;
         getFriends().then((friends) => setFriends(friends));
+        getActiveWorkouts();
     }, [userId]);
 
     return (
-        <div className="container">
-            <FriendRequests userId={userId} />
-            <h1>Welcome to the Home Page! {email}.</h1>
-            <p>You have successfully logged in.</p>
-            <CreateWorkoutForm userId={userId}/>
-            <h2>Friends</h2>
-            <form onSubmit={sendFriendRequest}>
-                <label htmlFor="userId">User ID of your friend:</label>
-                <input
-                    type="number"
-                    id="userId"
-                    name="userId"
-                    value={friendId}
-                    onChange={(e) => setFriendId(Number(e.target.value))}
-                    required
-                />
-                <button type="submit">Send Friend request</button>
-            </form>
-            <h2>All your friends:</h2>
-            {friends.length === 0 ? ( <p>No friends yet.</p> ) : ( <ul> {friends.map((friend) => ( <li key={friend.id}>{friend.name}</li> ))} </ul> )}
+        <div className="container mx-auto max-w-3xl p-6">
+            {/* Friend Requests Section */}
+            <div className="bg-white shadow-md rounded-lg p-4 mb-6">
+                <FriendRequests userId={userId} />
+            </div>
+
+            {/* Welcome Message */}
+            <div className="bg-gradient-to-r from-blue-500 to-purple-500 text-white rounded-lg p-6 mb-6">
+                <h1 className="text-2xl font-bold">Welcome, {email}!</h1>
+                <p className="text-lg">You have successfully logged in.</p>
+            </div>
+
+            {/* Active Workouts or Create New Workout */}
+            <div className="bg-white shadow-md rounded-lg p-4 mb-6">
+                {activeWorkouts.length === 0 ? (
+                    <CreateWorkoutForm userId={userId} />
+                ) : (
+                    <div>
+                        <h2 className="text-xl font-semibold mb-3">Active Workouts</h2>
+                        <ul className="divide-y divide-gray-200">
+                            {activeWorkouts.map((workout) => (
+                                <li
+                                    key={workout.id}
+                                    onClick={() => router.push(`/workout/${workout.id}`)}
+                                    className="p-3 cursor-pointer hover:bg-gray-100 rounded-lg transition"
+                                >
+                                    {workout.name}
+                                </li>
+                            ))}
+                        </ul>
+                    </div>
+                )}
+            </div>
+
+            {/* Add Friend Section */}
+            <div className="bg-white shadow-md rounded-lg p-4 mb-6">
+                <h2 className="text-xl font-semibold mb-3">Add a Friend</h2>
+                <form onSubmit={sendFriendRequest} className="flex gap-2">
+                    <input
+                        type="number"
+                        id="userId"
+                        name="userId"
+                        value={friendId}
+                        onChange={(e) => setFriendId(Number(e.target.value))}
+                        required
+                        placeholder="Enter friend’s User ID"
+                        className="w-full border border-gray-300 rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    />
+                    <button
+                        type="submit"
+                        className="bg-blue-500 text-white px-4 py-2 rounded-lg shadow hover:bg-blue-600 transition"
+                    >
+                        Send Request
+                    </button>
+                </form>
+            </div>
+
+            {/* Friends List */}
+            <div className="bg-white shadow-md rounded-lg p-4">
+                <h2 className="text-xl font-semibold mb-3">Your Friends</h2>
+                {friends.length === 0 ? (
+                    <p className="text-gray-500">No friends yet.</p>
+                ) : (
+                    <ul className="divide-y divide-gray-200">
+                        {friends.map((friend) => (
+                            <li key={friend.id} className="p-3">{friend.name}</li>
+                        ))}
+                    </ul>
+                )}
+            </div>
         </div>
+
     );
 }
