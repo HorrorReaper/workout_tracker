@@ -13,6 +13,7 @@ export default function Home() {
     const [userId, setUserId] = useState<number>(0);
     const [friends, setFriends] = useState<any[]>([]);
     const [activeWorkouts, setActiveWorkouts] = useState<any[]>([]);
+    const [lastWorkouts, setLastWorkouts] = useState<any[]>([]);
     const router = useRouter();
 
     // Add useEffect to handle the API call
@@ -85,10 +86,27 @@ export default function Home() {
             console.error('Error:', error);
         }
     }
+    const getLastWorkouts = async () => {
+        try {
+            const response = await fetch('/api/workout/getLastWorkouts', {
+                method: 'GET',
+                headers: { 'Content-Type': 'application/json' },
+            });
+
+            if (!response.ok) throw new Error('Failed to get last workouts.');
+            const data = await response.json();
+            setLastWorkouts(data.workouts);
+            console.log('Last workouts:', data.workouts);
+            return data;
+        } catch (error) {
+            console.error('Error:', error);
+        }
+    }
     useEffect(() => {
         if (!userId) return;
         getFriends().then((friends) => setFriends(friends));
         getActiveWorkouts();
+        getLastWorkouts();
     }, [userId]);
 
     return (
@@ -145,6 +163,80 @@ export default function Home() {
                     </ul>
                 )}
             </div>
+            {/* Friends List */}
+            <div className="bg-white shadow-lg rounded-xl p-6">
+                <h2 className="text-2xl font-bold text-gray-800 mb-4">Your Last Workouts</h2>
+
+                {lastWorkouts && lastWorkouts.length > 0 ? (
+                    <ul className="space-y-6">
+                        {lastWorkouts.map((workout) => (
+                            <li key={workout.workout_id} className="bg-gray-100 p-5 rounded-lg shadow-sm hover:shadow-md transition-shadow">
+                                {/* Workout Title & Date */}
+                                <div className="mb-3">
+                                    <h3 className="text-lg font-bold text-gray-900">{workout.title}</h3>
+                                    <p className="text-sm text-gray-600">
+                                        🕒 {new Date(workout.started_at).toLocaleString('de-DE', {
+                                        day: '2-digit',
+                                        month: '2-digit',
+                                        year: 'numeric',
+                                        hour: '2-digit',
+                                        minute: '2-digit',
+                                        hourCycle: 'h23',
+                                    })}
+                                    </p>
+                                </div>
+
+                                {/* Group Sets by Exercise */}
+                                {workout.sets && workout.sets.length > 0 ? (
+                                    <ul className="space-y-4">
+                                        {Object.values(
+                                            workout.sets.reduce((groupedSets, set) => {
+                                                if (!groupedSets[set.exercise_id]) {
+                                                    groupedSets[set.exercise_id] = {
+                                                        exercise_name: set.exercise_name, // Store exercise name only once
+                                                        sets: [],
+                                                    };
+                                                }
+                                                groupedSets[set.exercise_id].sets.push(set);
+                                                return groupedSets;
+                                            }, {})
+                                        ).map(({ exercise_name, sets }) => (
+                                            <li key={sets[0].exercise_id} className="border-l-4 border-blue-500 pl-4">
+                                                {/* Exercise Name */}
+                                                <h4 className="font-semibold text-blue-700 text-md">{exercise_name}</h4>
+
+                                                {/* Sets List */}
+                                                <ul className="text-sm text-gray-700 space-y-1 mt-1">
+                                                    {sets.map((set) => (
+                                                        <li key={`${workout.workout_id}-${set.set_id}`} className="flex justify-between bg-white p-2 rounded-md shadow-sm">
+                                                <span className="font-medium">
+                                                    Set {set.set_number}: {set.reps} reps, {set.weight} kg
+                                                </span>
+                                                            <span className="text-gray-500">
+                                                    {set.notes && <span className="italic mr-2">{set.notes}</span>}
+                                                                {set.RIR !== null && set.RIR !== undefined && (
+                                                                    <span className="text-gray-600"> (RIR: {set.RIR})</span>
+                                                                )}
+                                                </span>
+                                                        </li>
+                                                    ))}
+                                                </ul>
+                                            </li>
+                                        ))}
+                                    </ul>
+                                ) : (
+                                    <p className="text-sm text-gray-500">No sets logged for this workout.</p>
+                                )}
+                            </li>
+                        ))}
+                    </ul>
+                ) : (
+                    <p className="text-gray-500 text-center py-4">No workouts yet.</p>
+                )}
+            </div>
+
+
+
         </div>
 
     );

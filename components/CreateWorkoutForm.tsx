@@ -42,9 +42,11 @@ export default function CreateWorkoutForm({ userId }: { userId: number }) {
     };
 
     return (
-        <div>
-            <form onSubmit={handleSubmit}>
-                <label htmlFor="workout">Workout:</label>
+        <div className="max-w-md mx-auto bg-white shadow-md rounded-lg p-6">
+            <form onSubmit={handleSubmit} className="space-y-4">
+                <label htmlFor="workout" className="block text-gray-700 font-semibold">
+                    Workout Name:
+                </label>
                 <input
                     type="text"
                     id="workout"
@@ -52,10 +54,21 @@ export default function CreateWorkoutForm({ userId }: { userId: number }) {
                     value={workoutName}
                     onChange={(e) => setWorkoutName(e.target.value)}
                     required
+                    className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                    placeholder="Enter workout name..."
                 />
-                <button type="submit">Create Workout</button>
+                <button
+                    type="submit"
+                    className="w-full bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 rounded-lg transition"
+                >
+                    Create Workout
+                </button>
             </form>
-            {message && <p>{message}</p>}
+
+            {message && (
+                <p className="mt-4 text-center text-green-600 font-medium">{message}</p>
+            )}
         </div>
+
     );
 }

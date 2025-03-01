@@ -1,86 +1,48 @@
-'use client'; // Mark this as a Client Component
-
-import { useEffect, useState } from 'react';
+import { useEffect, useState } from "react";
 
 export default function WorkoutTimer() {
     const [elapsedTime, setElapsedTime] = useState(0);
-    const [isRunning, setIsRunning] = useState(false);
 
-    // Load saved timer state from local storage
     useEffect(() => {
-        const savedStartTime = localStorage.getItem('workoutStartTime');
-        const savedElapsedTime = localStorage.getItem('workoutElapsedTime');
+        // Check if start time exists in localStorage
+        let startTime = localStorage.getItem("workoutStartTime");
 
-        if (savedStartTime) {
-            const startTime = parseInt(savedStartTime, 10);
-            const currentTime = Date.now();
-            const elapsed = savedElapsedTime ? parseInt(savedElapsedTime, 10) : 0;
-            setElapsedTime(elapsed + (currentTime - startTime));
-            setIsRunning(true);
+        if (!startTime) {
+            // If no start time, set it to current timestamp
+            startTime = new Date().getTime().toString();
+            localStorage.setItem("workoutStartTime", startTime);
         }
+
+        // Convert startTime from localStorage to number
+        const startTimestamp = parseInt(startTime, 10);
+
+        // Function to update the elapsed time
+        const updateElapsedTime = () => {
+            const now = new Date().getTime();
+            setElapsedTime(now - startTimestamp);
+        };
+
+        // Start the interval to update elapsed time every second
+        const interval = setInterval(updateElapsedTime, 1000);
+        updateElapsedTime(); // Call it immediately to avoid delay
+
+        // Cleanup interval on component unmount
+        return () => clearInterval(interval);
     }, []);
 
-    // Start the timer
-    const startTimer = () => {
-        const startTime = Date.now();
-        localStorage.setItem('workoutStartTime', startTime.toString());
-        setIsRunning(true);
-    };
-
-    // Stop the timer
-    const stopTimer = () => {
-        localStorage.removeItem('workoutStartTime');
-        localStorage.setItem('workoutElapsedTime', elapsedTime.toString());
-        setIsRunning(false);
-    };
-
-    // Reset the timer
-    const resetTimer = () => {
-        localStorage.removeItem('workoutStartTime');
-        localStorage.removeItem('workoutElapsedTime');
-        setElapsedTime(0);
-        setIsRunning(false);
-    };
-
-    // Update the elapsed time every second
-    useEffect(() => {
-        let interval: NodeJS.Timeout;
-
-        if (isRunning) {
-            interval = setInterval(() => {
-                setElapsedTime((prev) => prev + 1000);
-            }, 1000);
-        }
-
-        return () => clearInterval(interval);
-    }, [isRunning]);
-
-    // Format the elapsed time (HH:MM:SS)
-    const formatTime = (time: number) => {
-        const hours = Math.floor(time / 3600000);
-        const minutes = Math.floor((time % 3600000) / 60000);
-        const seconds = Math.floor((time % 60000) / 1000);
-
-        return `${hours.toString().padStart(2, '0')}:${minutes
-            .toString()
-            .padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+    // Convert elapsed milliseconds to hh:mm:ss format
+    const formatTime = (milliseconds: number) => {
+        const totalSeconds = Math.floor(milliseconds / 1000);
+        const hours = Math.floor(totalSeconds / 3600);
+        const minutes = Math.floor((totalSeconds % 3600) / 60);
+        const seconds = totalSeconds % 60;
+        return `${String(hours).padStart(2, "0")}:${String(minutes).padStart(2, "0")}:${String(seconds).padStart(2, "0")}`;
     };
 
     return (
-        <div className="flex items-center gap-4">
-            <div className="text-2xl font-bold">{formatTime(elapsedTime)}</div>
-            {!isRunning ? (
-                <button onClick={startTimer} className="bg-blue-500 text-white px-4 py-2 rounded">
-                    Start
-                </button>
-            ) : (
-                <button onClick={stopTimer} className="bg-red-500 text-white px-4 py-2 rounded">
-                    Stop
-                </button>
-            )}
-            <button onClick={resetTimer} className="bg-gray-500 text-white px-4 py-2 rounded">
-                Reset
-            </button>
+        <div className="flex flex-col  p-4  rounded-lg shadow-md">
+            <h2 className="text-lg font-bold text-white">Workout Time</h2>
+            <p className="text-2xl font-mono text-blue-600 mt-2">{formatTime(elapsedTime)}</p>
         </div>
     );
 }

@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import pool from '@/lib/db';
-import { ResultSetHeader } from 'mysql2/promise'; // Import ResultSetHeader
+import { ResultSetHeader } from 'mysql2/promise';
+import {cookies} from "next/headers"; // Import ResultSetHeader
 
 export async function POST(request: Request) {
     try {
@@ -23,7 +24,7 @@ export async function POST(request: Request) {
 
         // Cast the result to ResultSetHeader
         const insertResult = result as ResultSetHeader;
-
+        console.log('Workout created:', insertResult.insertId, 'at', started_at);
         // Return success response
         return NextResponse.json(
             { message: 'Workout created successfully', workoutId: insertResult.insertId },
