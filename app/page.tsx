@@ -3,7 +3,6 @@ import CreateWorkoutForm from "@/components/CreateWorkoutForm";
 import { useState, useEffect } from "react"; // Add useEffect
 import FriendRequests from "@/components/FriendRequests";
 import {useRouter, useSearchParams} from 'next/navigation';
-import {router} from "next/client";
 import FriendRequestForm from "@/components/Home/FriendRequestForm";
 
 export default function Home() {
@@ -158,7 +157,7 @@ export default function Home() {
                 ) : (
                     <ul className="divide-y divide-gray-200">
                         {friends.map((friend) => (
-                            <li key={friend.id} className="p-3">{friend.name}</li>
+                            <li key={friend.id} className="p-3" onClick={() => router.push(`/user/${friend.id}`)}>{friend.name}</li>
                         ))}
                     </ul>
                 )}
