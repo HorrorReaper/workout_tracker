@@ -207,7 +207,7 @@ export default function Home() {
                                                 {/* Sets List */}
                                                 <ul className="text-sm text-gray-700 space-y-1 mt-1">
                                                     {sets.map((set) => (
-                                                        <li key={`${workout.workout_id}-${set.set_id}`} className="flex justify-between bg-white p-2 rounded-md shadow-sm">
+                                                        <li key={`${workout.workout_id}-${set.set_number}`} className="flex justify-between bg-white p-2 rounded-md shadow-sm">
                                                 <span className="font-medium">
                                                     Set {set.set_number}: {set.reps} reps, {set.weight} kg
                                                 </span>
