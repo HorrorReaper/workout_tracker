@@ -35,9 +35,11 @@ export async function POST(request: Request) {
                     LIMIT 5
             `, [id]
         );
+        const [maxWeights] = await pool.execute('SELECT workouts.user_id, description, MAX(weight) AS max_weight FROM workout_exercises, workouts, exercises WHERE workouts.id = workout_id AND workouts.user_id = ? AND exercises.id = exercise_id GROUP BY workouts.user_id, description;', [id]);
+        console.log('Max Weights:', maxWeights);
         console.log('User details:', user);
         console.log('Last workouts:', lastWorkouts);
-        return NextResponse.json({user, lastWorkouts});
+        return NextResponse.json({user, lastWorkouts, maxWeights});
     }catch (e) {
         console.error('Error getting last workouts:', e);
         return NextResponse.json(
