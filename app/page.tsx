@@ -4,10 +4,12 @@ import { useState, useEffect } from "react"; // Add useEffect
 import FriendRequests from "@/components/FriendRequests";
 import {useRouter, useSearchParams} from 'next/navigation';
 import FriendRequestForm from "@/components/Home/FriendRequestForm";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+
 
 export default function Home() {
-    const searchParams = useSearchParams();
-    const email = searchParams.get('email');
+    //const searchParams = useSearchParams();
+    //const email = searchParams.get('email');
     const [friendId, setFriendId] = useState<number>(0);
     const [userId, setUserId] = useState<number>(0);
     const [friends, setFriends] = useState<any[]>([]);
@@ -16,7 +18,7 @@ export default function Home() {
     const router = useRouter();
 
     // Add useEffect to handle the API call
-    useEffect(() => {
+    /*useEffect(() => {
         if (!email) return;
         const getUserId = async () => {
             try {
@@ -35,7 +37,25 @@ export default function Home() {
             }
         }
         getUserId();
-    }, [email]); // Add email as dependency
+    }, [email]); // Add email as dependency*/
+    useEffect(() => {
+        const getUserId = async () => {
+            try {
+                const response = await fetch('/api/tools/getUserId', {
+                    method: 'GET',
+                    headers: { 'Content-Type': 'application/json' },
+                });
+
+                if (!response.ok) throw new Error('Failed to get user ID.');
+                const data = await response.json();
+                setUserId(data.userId);
+                console.log('User ID:', data.userId);
+            } catch (error) {
+                console.error('Error:', error);
+            }
+        }
+        getUserId();
+    }, []);
 
     const sendFriendRequest = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -117,7 +137,7 @@ export default function Home() {
 
             {/* Welcome Message */}
             <div className="bg-gradient-to-r from-blue-500 to-purple-500 text-white rounded-lg p-6 mb-6">
-                <h1 className="text-2xl font-bold">Welcome, {email}!</h1>
+                <h1 className="text-2xl font-bold">Welcome, {userId}!</h1>
                 <p className="text-lg">You have successfully logged in.</p>
             </div>
 
@@ -157,13 +177,16 @@ export default function Home() {
                 ) : (
                     <ul className="divide-y divide-gray-200">
                         {friends.map((friend) => (
-                            <li key={friend.id} className="p-3" onClick={() => router.push(`/user/${friend.id}`)}>{friend.name}</li>
+                            <li key={friend.id} className="p-3 flex gap-2 align-middle hover:cursor-pointer" onClick={() => router.push(`/user/${friend.id}`)}><Avatar>
+                                <AvatarImage src={friend.profile_picture_url} />
+                                <AvatarFallback>CN</AvatarFallback>
+                            </Avatar><p className="mt-2">{friend.name}</p></li>
                         ))}
                     </ul>
                 )}
             </div>
             {/* Friends List */}
-            <div className="bg-white shadow-lg rounded-xl p-6">
+            <div className="bg-white shadow-lg rounded-xl p-6 mt-2">
                 <h2 className="text-2xl font-bold text-gray-800 mb-4">Your Last Workouts</h2>
 
                 {lastWorkouts && lastWorkouts.length > 0 ? (

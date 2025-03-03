@@ -8,7 +8,7 @@ export async function POST(request: Request) {
     try {
         // Get accepted friends
         const [friends] = await pool.execute(
-            `SELECT u.id, u.name, u.email 
+            `SELECT u.id, u.name, u.email, u.profile_picture_url 
        FROM friends f
        JOIN users u ON u.id = f.friend_id
        WHERE f.user_id = ? AND f.status = ?`,

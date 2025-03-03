@@ -31,7 +31,7 @@ import PauseTimer from "@/components/workout/pauseTImer";
 import FriendsComparisation from "@/components/workout/FriendsComparisation";
 import {router} from "next/client";
 
-export default function workoutTrackerPage({ params }) {
+export default function WorkoutTrackerPage({ params }) {
     const { id } = React.use(params);
     const [selectedExercises, setSelectedExercises] = useState<Exercise[]>([]);
     const [selectedValue, setSelectedValue] = useState<string>('normal'); // Default value is "normal"
@@ -155,7 +155,7 @@ export default function workoutTrackerPage({ params }) {
             localStorage.removeItem("workoutStartTime")
             setSelectedExercises([]);
             alert('Workout saved successfully!');
-            await router.push('/login');
+            await router.push('/');
         } catch (error) {
             console.error('Error saving workout:', error);
             alert('Failed to save workout. Please try again.');

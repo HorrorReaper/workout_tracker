@@ -40,8 +40,7 @@ export default function WorkoutTimer() {
     };
 
     return (
-        <div className="flex flex-col  p-4  rounded-lg shadow-md">
-            <h2 className="text-lg font-bold text-white">Workout Time</h2>
+        <div className="flex flex-col  p-4  rounded-lg shadow-md w-">
             <p className="text-2xl font-mono text-blue-600 mt-2">{formatTime(elapsedTime)}</p>
         </div>
     );
