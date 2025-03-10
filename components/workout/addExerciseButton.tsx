@@ -7,11 +7,11 @@ import {useState} from "react";
 export default function AddExerciseButton({
                                               onExerciseSelect,
                                           }: {
-    onExerciseSelect: (exercise: Exercise) => void;
+    onExerciseSelect: (exercise: Exercise[]) => void;
 }) {
     const [open, setOpen] = useState(false);
-    const handleExerciseSelect = (exercise: Exercise) => {
-        onExerciseSelect(exercise); // ✅ Add the exercise to the workout
+    const handleExerciseSelect = (exercises: Exercise[]) => {
+        onExerciseSelect(exercises); // ✅ Add the exercise to the workout
         setOpen(false); // ✅ Close the popover
     };
     return (

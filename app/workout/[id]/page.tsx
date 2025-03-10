@@ -52,9 +52,13 @@ export default function WorkoutTrackerPage({ params }) {
     }, [selectedExercises]);
 
     // Callback to handle exercise selection
-    const handleExerciseSelect = (exercise: Exercise) => {
+    /*const handleExerciseSelect = (exercise: Exercise) => {
         setSelectedExercises((prev) => [...prev, exercise]);
+    };*/
+    const handleExerciseSelect = (exercises: Exercise[]) => {
+        setSelectedExercises((prev) => [...prev, ...exercises]);
     };
+
 
     // Callback to handle adding sets
     const handleAddSet = async (exerciseId: number, reps: number, weight: number, notes: string, rir: number, type: string) => {
