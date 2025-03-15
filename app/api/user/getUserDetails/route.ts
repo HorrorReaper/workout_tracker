@@ -1,5 +1,6 @@
 import pool from "@/lib/db";
 import {NextResponse} from "next/server";
+import {cookies} from "next/headers";
 
 export async function POST(request: Request) {
     const { id } = await request.json();
@@ -39,7 +40,12 @@ export async function POST(request: Request) {
         console.log('Max Weights:', maxWeights);
         console.log('User details:', user);
         console.log('Last workouts:', lastWorkouts);
-        return NextResponse.json({user, lastWorkouts, maxWeights});
+        if(id === (await (cookies())).get('userId')?.value){
+            console.log("Current user");
+            return NextResponse.json({user, lastWorkouts, maxWeights, isCurrentUser: true});
+        }
+        console.log("Not current user");
+        return NextResponse.json({user, lastWorkouts, maxWeights, isCurrentUser: false});
     }catch (e) {
         console.error('Error getting last workouts:', e);
         return NextResponse.json(

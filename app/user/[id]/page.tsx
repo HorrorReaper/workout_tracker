@@ -1,6 +1,8 @@
 'use client';
 import React, {useEffect, useState} from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import {Popover, PopoverContent, PopoverTrigger} from "@/components/ui/popover";
+import TrackWeightPopover from "@/components/Profile/TrackWeightPopover";
 export default function UserPage({params}){
     const { id } = React.use(params);
     const [userName, setUserName] = useState<string>('');
@@ -8,6 +10,8 @@ export default function UserPage({params}){
     const [userProfilePicture, setUserProfilePicture] = useState<string>('');
     const [lastWorkouts, setLastWorkouts] = useState<any[]>([]);
     const [currentMaxes, setCurrentMaxes] = useState<any[]>([]);
+    const [isCurrentUser, setIsCurrentUser] = useState<boolean>(false);
+    const [open, setOpen] = useState(false);
     const getUserDetails = async () => {
         try{
             const response = await fetch(`/api/user/getUserDetails`, {
@@ -26,6 +30,12 @@ export default function UserPage({params}){
             setLastWorkouts(data.lastWorkouts);
             setCurrentMaxes(data.maxWeights);
             console.log('User details:', data);
+            if(data.isCurrentUser === true){
+                console.log('This is the current user');
+                setIsCurrentUser(true);
+                //hier weiter machen
+
+            }
 
         }catch (error) {
             console.error('Error getting user details:', error);
@@ -50,6 +60,20 @@ export default function UserPage({params}){
                     year: 'numeric',
                 })}
                 </p>
+                {
+                    isCurrentUser && (
+                        <Popover open={open} onOpenChange={setOpen}>
+                            <PopoverTrigger asChild>
+                        <button className="mt-4 bg-blue-500 text-white py-2 px-4 rounded-md hover:bg-blue-600">
+                            Track weight
+                        </button>
+                            </PopoverTrigger>
+                            <PopoverContent className="w-96 max-h-[400px] overflow-y-auto">
+                                <TrackWeightPopover/>
+                            </PopoverContent>
+                        </Popover>
+                    )
+                }
             </div>
             <Tabs defaultValue="account" >
                 <TabsList className={"flex justify-center mt-6 bg-white"}>
@@ -58,7 +82,8 @@ export default function UserPage({params}){
                 </TabsList>
                 <TabsContent value="lastWorkouts">
                     {/* Last Workouts Section */}
-                    <h2 className="text-2xl font-bold text-gray-900 mt-6 mb-4 border-b pb-2">{userName}&#39;s Last Workouts</h2>
+                    {isCurrentUser ? (<h2 className="text-2xl font-bold text-gray-900 mt-6 mb-4 border-b pb-2">Your Last Workouts</h2>):(<h2 className="text-2xl font-bold text-gray-900 mt-6 mb-4 border-b pb-2">{userName}&#39;s Last Workouts</h2>)}
+
 
                     {lastWorkouts && lastWorkouts.length > 0 ? (
                         <ul className="space-y-6">
@@ -132,7 +157,8 @@ export default function UserPage({params}){
                     )}
                 </TabsContent>
                 <TabsContent value="currentMaxes">
-                    <h2 className="text-2xl font-bold text-gray-900 mt-6 mb-4 border-b pb-2">{userName}&#39;s current Maxes</h2>
+                    {isCurrentUser ? (<h2 className="text-2xl font-bold text-gray-900 mt-6 mb-4 border-b pb-2">Your current Maxes</h2>):(<h2 className="text-2xl font-bold text-gray-900 mt-6 mb-4 border-b pb-2">{userName}&#39;s current Maxes</h2>)}
+
                     {currentMaxes && currentMaxes.length > 0 ? (
                         <ul className="space-y-4">
                             {currentMaxes.map((max) => (
