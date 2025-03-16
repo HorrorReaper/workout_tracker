@@ -3,6 +3,14 @@ import React, {useEffect, useState} from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {Popover, PopoverContent, PopoverTrigger} from "@/components/ui/popover";
 import TrackWeightPopover from "@/components/Profile/TrackWeightPopover";
+import {
+    Accordion,
+    AccordionContent,
+    AccordionItem,
+    AccordionTrigger,
+} from "@/components/ui/accordion"
+import HeightDialog from "@/components/Profile/HeightDialog";
+
 export default function UserPage({params}){
     const { id } = React.use(params);
     const [userName, setUserName] = useState<string>('');
@@ -11,6 +19,7 @@ export default function UserPage({params}){
     const [lastWorkouts, setLastWorkouts] = useState<any[]>([]);
     const [currentMaxes, setCurrentMaxes] = useState<any[]>([]);
     const [isCurrentUser, setIsCurrentUser] = useState<boolean>(false);
+    const [weights, setWeights] = useState<{ weight: number; recorded_at: string }[]>([]);
     const [open, setOpen] = useState(false);
     const getUserDetails = async () => {
         try{
@@ -34,6 +43,10 @@ export default function UserPage({params}){
                 console.log('This is the current user');
                 setIsCurrentUser(true);
                 //hier weiter machen
+                const response = await fetch('/api/user/weight');
+                if (!response.ok) throw new Error("Failed to fetch weights");
+                const data = await response.json();
+                setWeights(data);
 
             }
 
@@ -174,6 +187,40 @@ export default function UserPage({params}){
                     )}
                 </TabsContent>
             </Tabs>
+            <Accordion type="single" collapsible>
+                <AccordionItem value="item 1">
+                    <AccordionTrigger>
+                        Body Weight
+                    </AccordionTrigger>
+                    <AccordionContent>
+                        <p>Body Weight Content</p>
+                        <div className="mt-6">
+                            <h2 className="text-lg font-semibold">Last Entries</h2>
+                            <ul className="mt-2 space-y-2">
+                                {weights ? ( weights.map(({ weight, recorded_at }, index) => (
+                                    <li key={index} className="border p-2 rounded">
+                                        {new Date(recorded_at).toLocaleDateString('de-DE', {
+                                            day: '2-digit',
+                                            month: '2-digit',
+                                            year: 'numeric',
+                                        })}: {weight} kg
+                                    </li>
+                                ))) : ( <li>No entries yet</li> )}
+                            </ul>
+                        </div>
+                    </AccordionContent>
+                </AccordionItem>
+                <AccordionItem value="item-2">
+                    <AccordionTrigger>
+                        Height
+                    </AccordionTrigger>
+                    <AccordionContent>
+                        <p>Height Content</p>
+                        <h2 className="text-lg font-semibold">Your Height: </h2>
+                        <div className="flex"><p>180 cm</p> <HeightDialog/></div>
+                    </AccordionContent>
+                </AccordionItem>
+            </Accordion>
 
         </div>
 
